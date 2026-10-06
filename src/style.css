@@ -1,0 +1,501 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap');
+
+:root {
+  --neon-cyan: #00f0ff;
+  --neon-pink: #ff007f;
+  --neon-yellow: #ffea00;
+  --neon-green: #00ff88;
+  --bg-dark: #05070d;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: 'Share Tech Mono', monospace;
+  color: #e0f2fe;
+}
+
+#gameContainer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  cursor: crosshair;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* CRT Scanlines Overlay */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+  z-index: 10;
+}
+
+/* HUD Overlay */
+#hudOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+.hud-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.hud-bars {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hud-bar-container {
+  background: rgba(10, 15, 25, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.hud-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.hud-bar-track {
+  height: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.hud-bar-fill {
+  height: 100%;
+  transition: width 0.15s ease-out;
+}
+
+.hp-fill {
+  background: linear-gradient(90deg, #ff0055, #00ff88);
+  box-shadow: 0 0 12px #00ff88;
+}
+
+.oc-fill {
+  background: linear-gradient(90deg, #ff007f, #ffea00);
+  box-shadow: 0 0 12px #ffea00;
+}
+
+.pulse-ready {
+  color: var(--neon-yellow);
+  animation: pulse 1s infinite alternate;
+}
+
+.pulse-active {
+  color: #ff0055;
+  animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.7; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1.02); }
+}
+
+.hud-dash-charges {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.dash-pip {
+  width: 28px;
+  height: 8px;
+  border-radius: 2px;
+  border: 1px solid var(--neon-cyan);
+}
+
+.dash-pip.charged {
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px var(--neon-cyan);
+}
+
+.dash-pip.charging {
+  background: rgba(0, 240, 255, 0.2);
+}
+
+.hud-center-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-sector-badge {
+  background: rgba(10, 15, 25, 0.85);
+  border: 1px solid var(--neon-cyan);
+  padding: 6px 18px;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+/* Boss Health Bar */
+#bossBarContainer {
+  margin-top: 14px;
+  width: 500px;
+  background: rgba(15, 10, 20, 0.9);
+  border: 1px solid #ff0055;
+  padding: 6px;
+  box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+}
+
+#bossBarName {
+  font-size: 13px;
+  color: #ff007f;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.boss-bar-track {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#bossBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff00aa, #ff0055);
+  box-shadow: 0 0 10px #ff0055;
+  transition: width 0.1s ease;
+}
+
+.hud-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.hud-currency {
+  background: rgba(10, 15, 25, 0.85);
+  border: 1px solid var(--neon-cyan);
+  padding: 6px 14px;
+  font-size: 16px;
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.hud-implants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 240px;
+  justify-content: flex-end;
+}
+
+.implant-badge {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: rgba(10, 15, 25, 0.9);
+  border-radius: 4px;
+}
+
+.implant-badge.rarity-common { border: 1px solid var(--neon-cyan); box-shadow: 0 0 6px var(--neon-cyan); }
+.implant-badge.rarity-rare { border: 1px solid #a855f7; box-shadow: 0 0 8px #a855f7; }
+.implant-badge.rarity-epic { border: 1px solid var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
+.implant-badge.rarity-legendary { border: 1px solid var(--neon-yellow); box-shadow: 0 0 12px var(--neon-yellow); }
+
+.hud-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.hud-controls-hint {
+  font-size: 12px;
+  color: rgba(224, 242, 254, 0.6);
+  background: rgba(5, 7, 13, 0.8);
+  padding: 6px 12px;
+  border-left: 2px solid var(--neon-cyan);
+}
+
+/* UI Screens (Menu, Reward, Meta, Game Over) */
+.ui-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 7, 13, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 30px;
+  pointer-events: auto;
+}
+
+.ui-screen.hidden {
+  display: none !important;
+}
+
+.cyber-title {
+  font-family: 'Teko', sans-serif;
+  font-size: 82px;
+  line-height: 0.9;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
+  text-align: center;
+}
+
+.cyber-subtitle {
+  font-size: 16px;
+  letter-spacing: 4px;
+  color: var(--neon-cyan);
+  margin-bottom: 35px;
+  text-transform: uppercase;
+}
+
+.btn-cyber {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid var(--neon-cyan);
+  color: #ffffff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 18px;
+  letter-spacing: 2px;
+  padding: 14px 36px;
+  cursor: pointer;
+  margin: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+  text-transform: uppercase;
+}
+
+.btn-cyber:hover {
+  background: var(--neon-cyan);
+  color: #05070d;
+  box-shadow: 0 0 25px var(--neon-cyan);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Reward Cards */
+.reward-cards-container {
+  display: flex;
+  gap: 24px;
+  margin-top: 30px;
+  max-width: 960px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reward-card {
+  width: 260px;
+  background: rgba(10, 15, 25, 0.95);
+  border: 2px solid var(--neon-cyan);
+  border-radius: 6px;
+  padding: 24px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+.reward-card:hover {
+  transform: translateY(-6px) scale(1.03);
+}
+
+.reward-card.rarity-common { border-color: var(--neon-cyan); }
+.reward-card.rarity-common:hover { box-shadow: 0 0 25px var(--neon-cyan); }
+
+.reward-card.rarity-rare { border-color: #a855f7; }
+.reward-card.rarity-rare:hover { box-shadow: 0 0 25px #a855f7; }
+
+.reward-card.rarity-epic { border-color: var(--neon-pink); }
+.reward-card.rarity-epic:hover { box-shadow: 0 0 25px var(--neon-pink); }
+
+.reward-card.rarity-legendary { border-color: var(--neon-yellow); }
+.reward-card.rarity-legendary:hover { box-shadow: 0 0 30px var(--neon-yellow); }
+
+.card-icon {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.card-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+.card-tagline {
+  font-size: 13px;
+  color: var(--neon-cyan);
+  margin-bottom: 12px;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  flex-grow: 1;
+}
+
+.card-rarity {
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  padding: 3px 10px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Meta Hub Upgrade List */
+.meta-container {
+  width: 580px;
+  background: rgba(10, 15, 25, 0.95);
+  border: 1px solid var(--neon-cyan);
+  padding: 24px;
+  border-radius: 6px;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.2);
+}
+
+.meta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+}
+
+.meta-upgrades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.meta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+
+.meta-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.meta-lvl {
+  font-size: 12px;
+  color: var(--neon-yellow);
+  margin-left: 8px;
+}
+
+.meta-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+.btn-buy {
+  padding: 8px 18px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid var(--neon-yellow);
+  background: rgba(255, 234, 0, 0.1);
+  color: var(--neon-yellow);
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.btn-buy.buyable:hover {
+  background: var(--neon-yellow);
+  color: #05070d;
+  box-shadow: 0 0 15px var(--neon-yellow);
+}
+
+.btn-buy.disabled, .btn-buy.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #64748b;
+  color: #64748b;
+}
+
+/* Run Stats Summary */
+.stats-summary {
+  background: rgba(10, 15, 25, 0.85);
+  border: 1px solid rgba(255, 0, 85, 0.4);
+  padding: 18px 28px;
+  border-radius: 4px;
+  margin: 20px 0;
+  width: 360px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+  font-size: 14px;
+}

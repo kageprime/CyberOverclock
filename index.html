@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CYBERPULSE: OVERCLOCK - Cyberpunk Roguelite</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+</head>
+<body>
+  <div id="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+    <div class="scanlines"></div>
+
+    <!-- Gameplay HUD -->
+    <div id="hudOverlay">
+      <div class="hud-top">
+        <div class="hud-bars">
+          <!-- HP Bar -->
+          <div class="hud-bar-container">
+            <div class="hud-bar-label">
+              <span>HULL INTEGRITY</span>
+              <span id="hudHpText">100 / 100</span>
+            </div>
+            <div class="hud-bar-track">
+              <div id="hudHpFill" class="hud-bar-fill hp-fill" style="width: 100%"></div>
+            </div>
+          </div>
+
+          <!-- Overclock Bar -->
+          <div class="hud-bar-container">
+            <div class="hud-bar-label">
+              <span id="hudOcPrompt">OVERCLOCK SYNC</span>
+              <span>[E] KEY</span>
+            </div>
+            <div class="hud-bar-track">
+              <div id="hudOcFill" class="hud-bar-fill oc-fill" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Dash Charges -->
+          <div class="hud-dash-charges" id="hudDashPips"></div>
+        </div>
+
+        <!-- Center Sector Badge & Boss Bar -->
+        <div class="hud-center-top">
+          <div class="hud-sector-badge" id="hudSector">SECTOR 01 // ROOM 01/05</div>
+          <div id="bossBarContainer" class="hidden">
+            <div id="bossBarName">PROJECT TITAN // PHASE 1</div>
+            <div class="boss-bar-track">
+              <div id="bossBarFill" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Nanites & Cyberware Implants -->
+        <div class="hud-right">
+          <div class="hud-currency" id="hudNanites">0 💎</div>
+          <div class="hud-implants" id="hudImplants"></div>
+        </div>
+      </div>
+
+      <div class="hud-bottom">
+        <div class="hud-controls-hint">
+          [WASD] MOVE &nbsp;|&nbsp; [SPACE] DASH (i-frames) &nbsp;|&nbsp; [L-CLICK] BLADE COMBO &nbsp;|&nbsp; [R-CLICK / Q] LASER &nbsp;|&nbsp; [E] OVERCLOCK
+        </div>
+        <button id="btnMute" class="btn-cyber btn-secondary" style="font-size: 13px; padding: 6px 14px; margin: 0;">
+          🔊 AUDIO ON
+        </button>
+      </div>
+    </div>
+
+    <!-- Title Screen -->
+    <div id="screenMenu" class="ui-screen">
+      <div class="cyber-title">CYBERPULSE<br><span style="color: var(--neon-cyan)">OVERCLOCK</span></div>
+      <div class="cyber-subtitle">High-Octane Cyberpunk Action Roguelite</div>
+      
+      <div style="display: flex; gap: 16px;">
+        <button id="btnStart" class="btn-cyber">⚡ INITIALIZE RUN</button>
+        <button id="btnMeta" class="btn-cyber btn-secondary">🧬 NEURAL LAB</button>
+      </div>
+
+      <div style="margin-top: 40px; text-align: center; max-width: 500px; color: #94a3b8; font-size: 13px; line-height: 1.6;">
+        Slash through rogue security androids, deflect lasers with high-frequency photon blades, siphon nanites, and engage <strong>OVERCLOCK</strong> to distort spacetime.
+      </div>
+    </div>
+
+    <!-- Reward Selection Modal -->
+    <div id="screenReward" class="ui-screen hidden">
+      <div style="font-size: 26px; color: var(--neon-cyan); letter-spacing: 3px; font-weight: bold; margin-bottom: 8px;">
+        CYBERWARE REQUISITION
+      </div>
+      <div style="font-size: 14px; color: #94a3b8; margin-bottom: 24px;">
+        Select an implant to integrate into your neural chassis:
+      </div>
+      <div id="rewardCards" class="reward-cards-container"></div>
+    </div>
+
+    <!-- Neural Lab Meta Screen -->
+    <div id="screenMeta" class="ui-screen hidden">
+      <div class="meta-container">
+        <div class="meta-header">
+          <div>
+            <div style="font-size: 22px; font-weight: bold; color: var(--neon-cyan);">🧬 NEURAL LAB</div>
+            <div style="font-size: 12px; color: #94a3b8;">Permanent chassis augmentations across runs</div>
+          </div>
+          <div style="font-size: 20px; font-weight: bold; color: var(--neon-yellow);" id="metaCoresCount">0 💠</div>
+        </div>
+
+        <div id="metaUpgradeList" class="meta-upgrades-list"></div>
+
+        <div style="margin-top: 20px; text-align: center;">
+          <button id="btnMetaBack" class="btn-cyber btn-secondary" style="font-size: 14px; padding: 10px 28px;">
+            BACK TO MATRIX
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="screenGameOver" class="ui-screen hidden">
+      <div class="cyber-title" style="color: #ff0055; text-shadow: 0 0 25px #ff0055;">SYSTEM PURGED</div>
+      <div class="cyber-subtitle" style="color: #ff0055;">NEURAL SIGNAL TERMINATED</div>
+
+      <div id="gameOverStats" class="stats-summary"></div>
+
+      <button id="btnRestart" class="btn-cyber">🔄 RE-SYNCHRONIZE</button>
+    </div>
+
+    <!-- Victory Screen -->
+    <div id="screenVictory" class="ui-screen hidden">
+      <div class="cyber-title" style="color: #00ff88; text-shadow: 0 0 25px #00ff88;">MAINFRAME CLEARED</div>
+      <div class="cyber-subtitle" style="color: #00ff88;">PROJECT TITAN DESTROYED // SECTOR LIBERATED</div>
+
+      <div style="font-size: 16px; color: #e2e8f0; margin-bottom: 24px;">
+        You conquered both sectors and recovered <strong>+100 Meta Cores 💠</strong>!
+      </div>
+
+      <button id="btnVictoryRestart" class="btn-cyber">⚡ LAUNCH NEW RUN</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
